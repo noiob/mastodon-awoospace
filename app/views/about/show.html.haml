@@ -20,10 +20,15 @@
     = image_tag asset_pack_path('logo.png')
     = Setting.site_title
 
+  - unless @instance_presenter.site_description.blank?
+    %h3= t('about.description_headline', domain: Rails.configuration.x.local_domain)
+    %p= @instance_presenter.site_description.html_safe
+
+  %h3= 'What is Mastodon?'
   %p!= t('about.about_mastodon')
 
   .screenshot-with-signup
-    .mascot= image_tag asset_pack_path('fluffy-elephant-friend.png')
+    .mascot= image_tag asset_pack_path('awoospacefrontart-small.png')
 
     - if @instance_presenter.open_registrations
       = render 'registration'
@@ -71,10 +76,6 @@
         %li
           = fa_icon('li check-square')
           = t 'about.features.api'
-
-  - unless @instance_presenter.site_description.blank?
-    %h3= t('about.description_headline', domain: site_hostname)
-    %p!= @instance_presenter.site_description
 
   .actions
     .info
