@@ -63,6 +63,7 @@
       %h3= t('about.description_headline', domain: site_hostname)
       %p= @instance_presenter.site_description.html_safe.presence || t('about.generic_description', domain: site_hostname)
 
+<<<<<<< bba6510a8849757156ec63cf48cfcf03b89fdd25
   .features
     .container
       - if Setting.timeline_preview
@@ -78,3 +79,14 @@
       %p
         = link_to t('about.source_code'), 'https://github.com/tootsuite/mastodon'
         = " (#{@instance_presenter.version_number})"
+=======
+  .actions
+    .info
+      = link_to t('about.terms'), terms_path
+      ·
+      = link_to t('about.apps'), 'https://github.com/tootsuite/documentation/blob/master/Using-Mastodon/Apps.md'
+      ·
+      = link_to t('about.source_code'), 'https://github.com/tootsuite/mastodon'
+      ·
+      = link_to t('about.other_instances'), 'https://github.com/tootsuite/documentation/blob/master/Using-Mastodon/List-of-Mastodon-instances.md'
+>>>>>>> add some awoo.space customizations
