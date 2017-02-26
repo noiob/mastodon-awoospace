@@ -14,7 +14,11 @@ class StatusPolicy
     elsif private?
       owned? || account&.following?(status.account) || status.mentions.where(account: account).exists?
     else
-      account.nil? || !status.account.blocking?(account)
+      true if !account.nil? && !status.account.blocking?(account)
+      status.mentions.each do |mention|
+        false if !AllowDomainService.call(mention.account.domain)
+      end
+      account.nil?
     end
   end
 

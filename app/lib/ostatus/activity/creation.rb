@@ -114,7 +114,7 @@ class OStatus::Activity::Creation < OStatus::Activity::Base
   end
 
   def save_media(parent)
-    do_not_download = DomainBlock.find_by(domain: parent.account.domain)&.reject_media?
+    do_not_download = AllowDomainService.find_by(domain: parent.account.domain)&.reject_media?
 
     @xml.xpath('./xmlns:link[@rel="enclosure"]', xmlns: TagManager::XMLNS).each do |link|
       next unless link['href']
