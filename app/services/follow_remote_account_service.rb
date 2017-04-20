@@ -36,6 +36,7 @@ class FollowRemoteAccountService < BaseService
     return Account.find_local(confirmed_username) if TagManager.instance.local_domain?(confirmed_domain)
 
     confirmed_account = Account.find_remote(confirmed_username, confirmed_domain)
+    allow_domain_service = AllowDomainService.new
     if confirmed_account.nil?
       Rails.logger.debug "Creating new remote account for #{uri}"
 
@@ -49,7 +50,6 @@ class FollowRemoteAccountService < BaseService
     end
 
     account.last_webfingered_at = Time.now.utc
-    allow_domain_service = AllowDomainService.new
 
     account.remote_url  = data.link('http://schemas.google.com/g/2010#updates-from').href
     account.salmon_url  = data.link('salmon').href
