@@ -12,4 +12,8 @@ class DomainWhitelist < ApplicationRecord
   def self.blocked?(domain)
     !where(domain: domain).exists?
   end
+
+  def self.silenced?(domain)
+    where(domain: domain, severity: :silence).exists?
+  end
 end
