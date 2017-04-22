@@ -56,12 +56,5 @@
           %span= t 'about.domain_count_after'
       = render 'contact', contact: @instance_presenter
 
-  .extended-description
-    .container
-      = @instance_presenter.site_extended_description.html_safe.presence || t('about.extended_description_html')
-
-  .footer-links
-    .container
-      %p
-        = link_to t('about.source_code'), 'https://github.com/tootsuite/mastodon'
-        = " (#{@instance_presenter.version_number})"
+    .sidebar
+      = render 'whitelist'
