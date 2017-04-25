@@ -15,7 +15,7 @@ class Pubsubhubbub::DeliveryWorker
   def perform(subscription_id, payload)
     @subscription = Subscription.find(subscription_id)
     @payload = payload
-    process_delivery unless blocked_domain?
+    process_delivery unless AllowDomainService.new.blocked?(host)
   end
 
   private
