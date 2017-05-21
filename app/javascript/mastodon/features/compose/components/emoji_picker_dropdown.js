@@ -104,9 +104,11 @@ class EmojiPickerDropdown extends React.PureComponent {
     const { active, loading } = this.state;
 
     return (
-      <Dropdown ref={this.setRef} style={dropdownStyle}>
-        <DropdownTrigger className='emoji-button' title={intl.formatMessage(messages.emoji)} style={dropdownTriggerStyle}>
-          <img draggable="false" className="emojione" alt="🐺" src="/emoji/1f43a.svg" />
+      <Dropdown ref={this.setRef} className='emoji-picker__dropdown' onShow={this.onShowDropdown} onHide={this.onHideDropdown}>
+        <DropdownTrigger className='emoji-button' title={intl.formatMessage(messages.emoji)}>
+          <img draggable="false"
+               className={`emojione ${active && loading ? "pulse-loading" : ''}`}
+               alt="🐺" src="/emoj/i1f43a.svg" >
         </DropdownTrigger>
         <DropdownContent className='dropdown__left'>
           {
