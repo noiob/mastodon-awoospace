@@ -161,6 +161,10 @@ class Account < ApplicationRecord
     Rails.cache.fetch("exclude_domains_for:#{id}") { domain_blocks.pluck(:domain) }
   end
 
+  def included_from_timeline_domains
+    Rails.cache.fetch("include_domains_for:#{id}") { domain_whitelists.pluck(:domain) }
+  end
+
   class << self
     def find_local!(username)
       find_remote!(username, nil)

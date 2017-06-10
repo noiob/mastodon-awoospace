@@ -6,7 +6,9 @@ class UnblockDomainService < BaseService
   def call(domain_block, retroactive)
     @domain_block = domain_block
     process_retroactive_updates if retroactive
-    domain_block.destroy
+    if !DomainWhitelist.enabled?
+      domain_block.destroy
+    end
   end
 
   def process_retroactive_updates

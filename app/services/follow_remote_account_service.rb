@@ -39,10 +39,10 @@ class FollowRemoteAccountService < BaseService
     if confirmed_account.nil?
       Rails.logger.debug "Creating new remote account for #{uri}"
 
-      domain_block = DomainBlock.find_by(domain: domain)
+      domain_severity = AllowDomainService.new.call(domain: confirmed_domain)
       account = Account.new(username: confirmed_username, domain: confirmed_domain)
-      account.suspended   = true if domain_block && domain_block.suspend?
-      account.silenced    = true if domain_block && domain_block.silence?
+      account.suspended   = domain_severity == :suspended
+      account.silenced    = domain_severity == :silenced
       account.private_key = nil
     else
       account = confirmed_account
