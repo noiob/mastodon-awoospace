@@ -41,7 +41,7 @@ defaults: &defaults
     - root
     - webmaster
     - administrator
-  whitelist_enabled: false
+  whitelist_enabled: true
 development:
   <<: *defaults
 
