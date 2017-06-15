@@ -49,7 +49,7 @@ defaults: &defaults
     - webmaster
     - administrator
   bootstrap_timeline_accounts: ''
-  whitelist_enabled: false
+  whitelist_enabled: true
 
 development:
   <<: *defaults
