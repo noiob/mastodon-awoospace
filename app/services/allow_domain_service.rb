@@ -6,6 +6,13 @@ class AllowDomainService < BaseService
     :enable
   end
 
+  def self.record_type
+    if DomainWhitelist.enabled?
+      DomainWhitelist
+    else
+      DomainBlock
+    end
+
   def self.call(domain)
     return true if domain.nil?
     domain = self.find_by(domain)
@@ -18,8 +25,7 @@ class AllowDomainService < BaseService
   end
 
   def self.reject_media?(domain)
-    record_type = if DomainWhitelist.enabled? then DomainWhitelist else DomainBlock end
-    return record_type.find_by(domain: domain)&.reject_media?
+    return self.record_type.find_by(domain: domain)&.reject_media?
   end
 
   def self.find_by(domain)
