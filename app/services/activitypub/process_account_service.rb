@@ -118,23 +118,15 @@ class ActivityPub::ProcessAccountService < BaseService
   end
 
   def skip_download?
-    @account.suspended? || domain_access&.reject_media?
+    @account.suspended? || AllowDomainService.reject_media?(@domain)
   end
 
   def auto_suspend?
-    default_allow_check && domain_access.suspend?
+    AllowDomainService.blocked?(@domain)
   end
 
   def auto_silence?
-    default_allow_check && domain_access.silence?
+    AllowDomainService.silenced?(@domain)
   end
 
-  def default_allow_check
-    AllowDomainWhitelist.default_allow == :enable && domain_access.nil? || !domain_access.nil?
-  end
-
-  def domain_access
-    return @domain_access if defined?(@domain_access)
-    @domain_access = AllowDomainService.record_type.find_by(domain: @domain)
-  end
 end
