@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class NotifyService < BaseService
-  def call(recipient, activity)
+  def call(recipient, activity, status)
     @recipient    = recipient
     @activity     = activity
     @notification = Notification.new(account: @recipient, activity: @activity)
+    @visibility   = status.visibility
 
     return if recipient.user.nil? || blocked?
 
@@ -43,8 +44,9 @@ class NotifyService < BaseService
     blocked ||= @recipient.blocking?(@notification.from_account)                                                                     # Skip for blocked accounts
     blocked ||= @recipient.muting?(@notification.from_account)                                                                       # Skip for muted accounts
     blocked ||= (@notification.from_account.silenced? && !@recipient.following?(@notification.from_account))                         # Hellban
-    blocked ||= (@recipient.user.settings.interactions['must_be_follower']  && !@notification.from_account.following?(@recipient))   # Options
-    blocked ||= (@recipient.user.settings.interactions['must_be_following'] && !@recipient.following?(@notification.from_account))   # Options
+    blocked ||= (@recipient.user.settings.interactions['must_be_follower']     && !@notification.from_account.following?(@recipient))   # Options
+    blocked ||= (@recipient.user.settings.interactions['must_be_following']    && !@recipient.following?(@notification.from_account))   # Options
+    blocked ||= (@recipient.user.settings.interactions['must_be_following_dm'] && !@recipient.following?(@notification.from_account) && @visibility['direct'])   # Options
     blocked ||= conversation_muted?
     blocked ||= send("blocked_#{@notification.type}?")                                                                               # Type-dependent filters
     blocked
