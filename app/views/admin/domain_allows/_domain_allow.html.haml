@@ -1,0 +1,10 @@
+%tr
+  %td.domain
+    %samp= domain_whitelist.domain
+  %td.severity
+    = t("admin.domain_whitelists.severities.#{domain_whitelist.severity}")
+  %td.reject_media
+    - if domain_whitelist.reject_media? || domain_whitelist.suspend?
+      %i.fa.fa-check
+  %td
+    = table_link_to 'undo', t('admin.domain_whitelists.undo'), admin_domain_allow_path(domain_whitelist)

@@ -1,0 +1,20 @@
+- content_for :page_title do
+  = t('admin.domain_allows.show.title', domain: @domain_allow.domain)
+
+= simple_form_for @domain_allow, url: admin_domain_allow_path(@domain_allow), method: :delete do |f|
+
+  - if (@domain_allow.noop?)
+    = f.input :retroactive,
+      as: :hidden,
+      input_html: { :value => "0" }
+  - else
+    = f.input :retroactive,
+      as: :boolean,
+      wrapper: :with_label,
+      label: t(".retroactive.#{@domain_allow.severity}"),
+      hint: t(:affected_accounts,
+        scope: [:admin, :domain_allows, :show],
+        count: @domain_allow.accounts_count)
+
+  .actions
+    = f.button :button, t('.undo'), type: :submit
