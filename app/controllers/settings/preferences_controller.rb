@@ -43,7 +43,7 @@ class Settings::PreferencesController < Settings::BaseController
       :setting_noindex,
       :setting_hide_network,
       notification_emails: %i(follow follow_request reblog favourite mention digest),
-      interactions: %i(must_be_follower must_be_following must_be_following_dm)
+      interactions: %i(must_be_follower must_be_following must_be_following_dm must_be_one_day_old)
     )
   end
 end
