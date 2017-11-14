@@ -45,6 +45,10 @@ class NotifyService < BaseService
     false
   end
 
+  def sender_more_than_one_day?
+      Time.now - @notification.from_account.created_at < 1.days
+  end
+
   def blocked?
     follow_attempted = @recipient.following?(@notification.from_account) || @recipient.requested?(@notification.from_account)        # Check for follow or follow request
     blocked   = @recipient.suspended?                                                                                                # Skip if the recipient account is suspended anyway
@@ -56,6 +60,7 @@ class NotifyService < BaseService
     blocked ||= @recipient.user.settings.interactions['must_be_follower']     && !@notification.from_account.following?(@recipient)  # Options
     blocked ||= @recipient.user.settings.interactions['must_be_following']    && !follow_attempted                                   # Options
     blocked ||= @recipient.user.settings.interactions['must_be_following_dm'] && !follow_attempted && visibility == 'direct'         # Options
+    blocked ||= @recipient.user.settings.interactions['must_be_one_day_old'] && !follow_attempted && sender_more_than_one_day?       # Options
     blocked ||= conversation_muted?
     blocked ||= send("blocked_#{@notification.type}?")                                                                               # Type-dependent filters
     blocked
