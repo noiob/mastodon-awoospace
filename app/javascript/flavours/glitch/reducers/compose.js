@@ -227,7 +227,7 @@ export default function compose(state = initialState, action) {
       map.set('text', statusToTextMentions(state, action.status));
       map.set('privacy', privacyPreference(action.status.get('visibility'), state.get('default_privacy')));
       map.set('advanced_options', new ImmutableMap({
-        do_not_federate: /👁\ufe0f?<\/p>$/.test(action.status.get('content')),
+        do_not_federate: /🐺\ufe0f?<\/p>$/.test(action.status.get('content')),
       }));
       map.set('focusDate', new Date());
       map.set('preselectDate', new Date());

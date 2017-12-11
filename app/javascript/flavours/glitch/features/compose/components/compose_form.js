@@ -158,7 +158,7 @@ export default class ComposeForm extends ImmutablePureComponent {
   render () {
     const { intl, onPaste, showSearch } = this.props;
     const disabled = this.props.is_submitting;
-    const maybeEye = (this.props.advanced_options && this.props.advanced_options.do_not_federate) ? ' 👁️' : '';
+    const maybeEye = (this.props.advanced_options && this.props.advanced_options.do_not_federate) ? ' 🐺' : '';
     const text     = [this.props.spoiler_text, countableText(this.props.text), maybeEye].join('');
 
     const secondaryVisibility = this.props.settings.get('side_arm');
