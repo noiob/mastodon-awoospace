@@ -14,7 +14,7 @@
   }
 }
 
-.compose-form__sensitive-button__icon {
+.sensitive {
   &.inverted.active {
     color: #ffffff;
     background-color: #FF5500;
@@ -44,7 +44,7 @@
       position: absolute;
       bottom: 0px;
       width: auto;
-      height: 75%;
+      height: 70%;
       left: 60px;
     }
   }
