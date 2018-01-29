@@ -43,9 +43,9 @@
     .mascot {
       position: absolute;
       bottom: 0px;
-      width: auto;
-      height: 70%;
-      left: 60px;
+      width: 75%;
+      height: auto;
+      left: 0px;
     }
   }
 }
@@ -53,5 +53,22 @@
 #whitelist {
   ul {
     columns: 3 250px;
+  }
+}
+
+.status__content {
+  padding: 0px;
+}
+
+.drawer {
+  @for $i from 0 through 3 {
+    &.mbstobon-#{$i} > .contents {
+      background-image: none;
+      filter: none;
+      & > .mastodon {
+        background: url("~images/mastodon-getting-started.png") no-repeat left bottom / contain;
+	filter: none;
+      }
+    }
   }
 }
