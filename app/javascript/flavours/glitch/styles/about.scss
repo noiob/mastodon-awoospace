@@ -1319,18 +1319,6 @@ $small-breakpoint: 960px;
           display: none;
         }
       }
-
-      @import 'landing_page';
-
-      @keyframes floating {
-        from {
-          transform: translate(0, 0);
-        }
-
-        65% {
-          transform: translate(0, 4px);
-        }
-      }
     }
   }
 }
