@@ -1,4 +1,5 @@
 @import 'application';
+@import 'landing_page';
 
 .button {
   &:disabled {
@@ -71,4 +72,20 @@
       }
     }
   }
+}
+
+.sensitive-info {
+  left: 26px;
+}
+
+.status__info {
+  padding-left: 68px;
+}
+
+.status {
+  padding-left: 0;
+}
+
+.sensitive-info {
+  padding-left: 20px;
 }
