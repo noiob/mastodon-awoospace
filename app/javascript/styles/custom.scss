@@ -57,10 +57,6 @@
   }
 }
 
-.status__content {
-  padding: 0px;
-}
-
 .drawer {
   @for $i from 0 through 3 {
     &.mbstobon-#{$i} > .contents {
@@ -86,6 +82,24 @@
   padding-left: 0;
 }
 
-.sensitive-info {
-  padding-left: 20px;
+.status__action-bar {
+  padding-left: 12px;
+}
+
+.status .status__content {
+  padding: 0 12px;
+}
+
+.media-gallery.full-width {
+  margin-left: unset;
+}
+
+.status {
+  .notification__message {
+    margin: -10px 0 10px 90px !important;
+  }
+}
+
+.boost-modal__status-header .status__display-name {
+  padding-left: 78px;
 }
