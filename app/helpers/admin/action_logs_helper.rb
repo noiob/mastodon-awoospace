@@ -19,7 +19,7 @@ module Admin::ActionLogsHelper
       record.shortcode
     when 'Report'
       link_to "##{record.id}", admin_report_path(record)
-    when 'DomainBlock', 'EmailDomainBlock'
+    when 'DomainWhitelist', 'DomainBlock', 'EmailDomainBlock'
       link_to record.domain, "https://#{record.domain}"
     when 'Status'
       link_to record.account.acct, TagManager.instance.url_for(record)
