@@ -6,4 +6,4 @@
         - @instance_presenter.whitelist.each do |site|
           .whitelist-site
             %li
-              = link_to site.domain + (DomainWhitelist.silenced?(site.domain) ? ' (silenced)' : ''), 'https://' + site.domain, :remote => true
+              = link_to site.domain + (DomainWhitelist.silenced?(site.domain) ? ' (silenced)' : ''), 'https://' + site.domain
