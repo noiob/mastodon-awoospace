@@ -85,3 +85,8 @@
   padding: 0;
   // hmm
 }
+
+//no gaps in mobile mode
+@media screen and (min-width: 360px) {
+  .columns-area { padding: 0px !important}
+}
