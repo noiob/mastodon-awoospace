@@ -54,6 +54,16 @@
   }
 }
 
+#whitelist-column {
+  grid-row: 4;
+}
+
+@media screen and (max-width: 415px) {
+  #whitelist-column {
+    grid-row: 5;
+  }
+}
+
 .drawer {
   @for $i from 0 through 3 {
     &.mbstobon-#{$i} > .contents {

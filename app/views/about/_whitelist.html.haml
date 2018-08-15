@@ -1,7 +1,7 @@
 - if DomainWhitelist.enabled?
-  .panel#whitelist
-    %h3.panel-header= t 'about.domain_whitelist'
-    .panel-list
+  .box-widget#whitelist
+    .rich-formatting
+      %h3= t 'about.domain_whitelist'
       %ul
         - @instance_presenter.whitelist.each do |site|
           .whitelist-site

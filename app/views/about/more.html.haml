@@ -24,7 +24,7 @@
             %span= t 'about.status_count_after'
         .row__mascot
           .landing-page__mascot
-            = image_tag asset_pack_path('elephant_ui_plane.svg')
+            = image_tag asset_pack_path('awoospacefrontart-wolf.png')
 
   .column-2
     .landing-page__information.contact-widget
@@ -45,5 +45,5 @@
     .box-widget
       .rich-formatting= @instance_presenter.site_extended_description.html_safe.presence || t('about.extended_description_html')
 
-.container
-  = render 'whitelist'
+  .column-3#whitelist-column
+    = render 'whitelist'
