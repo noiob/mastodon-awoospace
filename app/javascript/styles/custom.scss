@@ -48,22 +48,6 @@
   }
 }
 
-#whitelist {
-  ul {
-    columns: 3 250px;
-  }
-}
-
-#whitelist-column {
-  grid-row: 4;
-}
-
-@media screen and (max-width: 415px) {
-  #whitelist-column {
-    grid-row: 5;
-  }
-}
-
 .drawer {
   @for $i from 0 through 3 {
     &.mbstobon-#{$i} > .contents {
@@ -88,5 +72,19 @@
 
 //no gaps in mobile mode
 @media screen and (min-width: 360px) {
-  .columns-area { padding: 0px !important}
+  .tabs-bar {
+    margin: 0 !important
+    }
+    
+    .columns-area {
+    padding: 0 !important
+    }
+    
+    .react-swipeable-view-container .columns-area {
+    height: 100% !important
+    }
+    
+    .getting-started__trends, .getting-started__wrapper, .search {
+    margin: 0 !important
+    }
 }

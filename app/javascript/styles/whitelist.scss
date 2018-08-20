@@ -1,0 +1,15 @@
+#whitelist {
+    ul {
+      columns: 3 250px;
+    }
+  }
+  
+  #whitelist-column {
+    grid-row: 4;
+  }
+  
+  @media screen and (max-width: 415px) {
+    #whitelist-column {
+      grid-row: 5;
+    }
+  }
