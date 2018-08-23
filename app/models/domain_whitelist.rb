@@ -14,8 +14,7 @@ class DomainWhitelist < ApplicationRecord
   end
 
   def self.silenced?(domain)
-    whitelist = where(domain: domain)
-    whitelist.exists? && whitelist[0].severity == :silence
+    where(domain: domain, severity: silence).exists?
   end
 
   before_validation :normalize_domain
