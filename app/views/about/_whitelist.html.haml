@@ -1,7 +1,7 @@
 - if DomainWhitelist.enabled?
   .box-widget#whitelist
     .rich-formatting
-      %h3= t 'about.domain_whitelist'
+      %h2= 'Allowlist'
       %ul
         - @instance_presenter.whitelist.each do |site|
           .whitelist-site
