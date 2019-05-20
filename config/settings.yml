@@ -31,6 +31,7 @@ defaults: &defaults
   system_font_ui: false
   noindex: false
   hide_followers_count: false
+  enable_keybase: true
   flavour: 'glitch'
   skin: 'awoo'
   aggregate_reblogs: true
@@ -63,6 +64,9 @@ defaults: &defaults
   peers_api_enabled: true
   show_known_fediverse_at_about_page: true
   whitelist_enabled: true
+  show_reblogs_in_public_timelines: false
+  show_replies_in_public_timelines: false
+  default_content_type: 'text/plain'
 
 development:
   <<: *defaults
