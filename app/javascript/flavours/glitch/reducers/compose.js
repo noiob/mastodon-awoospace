@@ -177,7 +177,7 @@ function continueThread (state, status) {
     map.set('in_reply_to', status.id);
     map.update(
       'advanced_options',
-      map => map.merge(new ImmutableMap({ do_not_federate: /👁\ufe0f?\u200b?(?:<\/p>)?$/.test(status.content) }))
+      map => map.merge(new ImmutableMap({ do_not_federate: /🐺\ufe0f?\u200b?(?:<\/p>)?$/.test(status.content) }))
     );
     map.set('privacy', status.visibility);
     map.set('sensitive', false);
