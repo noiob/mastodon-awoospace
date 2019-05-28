@@ -7,9 +7,9 @@ class WhitelistDomainService < BaseService
     d.save!
 
     if severity == :silence
-      Account.where(domain: domain).update_all(silenced: true)
+      Account.where(domain: domain).update_all(silenced_at: Time.now.utc)
     elsif severity == :enable
-      Account.where(:domain => domain).update_all(suspended: false)
+      Account.where(:domain => domain).update_all(suspended_at: nil)
     end
   end
 end
