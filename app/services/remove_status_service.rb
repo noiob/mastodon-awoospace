@@ -3,6 +3,7 @@
 class RemoveStatusService < BaseService
   include StreamEntryRenderer
   include Redisable
+  include Payloadable
 
   def call(status, **options)
     @payload      = Oj.dump(event: :delete, payload: status.id.to_s)
@@ -47,6 +48,7 @@ class RemoveStatusService < BaseService
 
   def remove_from_self
     FeedManager.instance.unpush_from_home(@account, @status)
+    FeedManager.instance.unpush_from_direct(@account, @status) if @status.direct_visibility?
   end
 
   def remove_from_followers
@@ -116,15 +118,7 @@ class RemoveStatusService < BaseService
   end
 
   def signed_activity_json
-    @signed_activity_json ||= Oj.dump(ActivityPub::LinkedDataSignature.new(activity_json).sign!(@account))
-  end
-
-  def activity_json
-    @activity_json ||= ActiveModelSerializers::SerializableResource.new(
-      @status,
-      serializer: @status.reblog? ? ActivityPub::UndoAnnounceSerializer : ActivityPub::DeleteSerializer,
-      adapter: ActivityPub::Adapter
-    ).as_json
+    @signed_activity_json ||= Oj.dump(serialize_payload(@status, @status.reblog? ? ActivityPub::UndoAnnounceSerializer : ActivityPub::DeleteSerializer, signer: @account))
   end
 
   def remove_reblogs
@@ -166,9 +160,8 @@ class RemoveStatusService < BaseService
 
   def remove_from_direct
     @mentions.each do |mention|
-      Redis.current.publish("timeline:direct:#{mention.account.id}", @payload) if mention.account.local?
+      FeedManager.instance.unpush_from_direct(mention.account, @status) if mention.account.local?
     end
-    Redis.current.publish("timeline:direct:#{@account.id}", @payload) if @account.local?
   end
 
   def lock_options

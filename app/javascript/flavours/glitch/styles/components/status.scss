@@ -33,6 +33,12 @@
 
   .status__content__text,
   .e-content {
+
+    & > ul,
+    & > ol {
+      margin-bottom: 20px;
+    }
+
     h1, h2, h3, h4, h5 {
       margin-top: 20px;
       margin-bottom: 20px;
@@ -40,11 +46,11 @@
 
     h1, h2 {
       font-weight: 700;
-      font-size: 18px;
+      font-size: 1.2em;
     }
 
     h2 {
-      font-size: 16px;
+      font-size: 1.1em;
     }
 
     h3, h4, h5 {
@@ -209,7 +215,7 @@
     outline: 0;
     background: lighten($ui-base-color, 4%);
 
-    .status.status-direct {
+    &.status.status-direct:not(.read) {
       background: lighten($ui-base-color, 12%);
 
       &.muted {
@@ -249,8 +255,9 @@
     margin-top: 8px;
   }
 
-  &.status-direct {
+  &.status-direct:not(.read) {
     background: lighten($ui-base-color, 8%);
+    border-bottom-color: lighten($ui-base-color, 12%);
   }
 
   &.light {
@@ -333,7 +340,7 @@
     &:focus > .status__content:after {
       background: linear-gradient(rgba(lighten($ui-base-color, 4%), 0), rgba(lighten($ui-base-color, 4%), 1));
     }
-    &.status-direct> .status__content:after {
+    &.status-direct:not(.read)> .status__content:after {
       background: linear-gradient(rgba(lighten($ui-base-color, 8%), 0), rgba(lighten($ui-base-color, 8%), 1));
     }
 
@@ -599,7 +606,7 @@
   }
 }
 
-.status__display-name,
+a.status__display-name,
 .reply-indicator__display-name,
 .detailed-status__display-name,
 .account__display-name {
@@ -987,5 +994,20 @@ a.status-card.compact:hover {
     .fa {
       color: $dark-text-color;
     }
+  }
+}
+
+.status__wrapper--filtered__button {
+  display: inline;
+  color: lighten($ui-highlight-color, 8%);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  line-height: inherit;
+
+  &:hover,
+  &:active {
+    text-decoration: underline;
   }
 }

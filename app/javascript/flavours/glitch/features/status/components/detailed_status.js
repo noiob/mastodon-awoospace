@@ -33,6 +33,8 @@ export default class DetailedStatus extends ImmutablePureComponent {
     onHeightChange: PropTypes.func,
     domain: PropTypes.string.isRequired,
     compact: PropTypes.bool,
+    showMedia: PropTypes.bool,
+    onToggleMediaVisibility: PropTypes.func,
   };
 
   state = {
@@ -129,14 +131,14 @@ export default class DetailedStatus extends ImmutablePureComponent {
     } else if (status.get('media_attachments').size > 0) {
       if (status.get('media_attachments').some(item => item.get('type') === 'unknown')) {
         media = <AttachmentList media={status.get('media_attachments')} />;
-      } else if (status.getIn(['media_attachments', 0, 'type']) === 'video') {
-        const video = status.getIn(['media_attachments', 0]);
+      } else if (['video', 'audio'].includes(status.getIn(['media_attachments', 0, 'type']))) {
+        const attachment = status.getIn(['media_attachments', 0]);
         media = (
           <Video
-            preview={video.get('preview_url')}
-            blurhash={video.get('blurhash')}
-            src={video.get('url')}
-            alt={video.get('description')}
+            preview={attachment.get('preview_url')}
+            blurhash={attachment.get('blurhash')}
+            src={attachment.get('url')}
+            alt={attachment.get('description')}
             inline
             sensitive={status.get('sensitive')}
             letterbox={settings.getIn(['media', 'letterbox'])}
@@ -144,10 +146,11 @@ export default class DetailedStatus extends ImmutablePureComponent {
             preventPlayback={!expanded}
             onOpenVideo={this.handleOpenVideo}
             autoplay
-            revealed={settings.getIn(['media', 'reveal_behind_cw']) && !!status.get('spoiler_text') ? true : undefined}
+            visible={this.props.showMedia}
+            onToggleVisibility={this.props.onToggleMediaVisibility}
           />
         );
-        mediaIcon = 'video-camera';
+        mediaIcon = attachment.get('type') === 'video' ? 'video-camera' : 'music';
       } else {
         media = (
           <MediaGallery
@@ -158,7 +161,8 @@ export default class DetailedStatus extends ImmutablePureComponent {
             fullwidth={settings.getIn(['media', 'fullwidth'])}
             hidden={!expanded}
             onOpenMedia={this.props.onOpenMedia}
-            revealed={settings.getIn(['media', 'reveal_behind_cw']) && !!status.get('spoiler_text') ? true : undefined}
+            visible={this.props.showMedia}
+            onToggleVisibility={this.props.onToggleMediaVisibility}
           />
         );
         mediaIcon = 'picture-o';

@@ -6,7 +6,7 @@ import IconButton from './icon_button';
 import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { isIOS } from 'flavours/glitch/util/is_mobile';
 import classNames from 'classnames';
-import { autoPlayGif, displayMedia } from 'flavours/glitch/util/initial_state';
+import { autoPlayGif, displayMedia, useBlurhash } from 'flavours/glitch/util/initial_state';
 import { decode } from 'blurhash';
 
 const messages = defineMessages({
@@ -101,6 +101,8 @@ class Item extends React.PureComponent {
   }
 
   _decode () {
+    if (!useBlurhash) return;
+
     const hash   = this.props.attachment.get('blurhash');
     const pixels = decode(hash, 32, 32);
 
@@ -177,7 +179,7 @@ class Item extends React.PureComponent {
     if (attachment.get('type') === 'unknown') {
       return (
         <div className={classNames('media-gallery__item', { standalone })} key={attachment.get('id')} style={{ left: left, top: top, right: right, bottom: bottom, width: `${width}%`, height: `${height}%` }}>
-          <a className='media-gallery__item-thumbnail' href={attachment.get('remote_url')} target='_blank' style={{ cursor: 'pointer' }}>
+          <a className='media-gallery__item-thumbnail' href={attachment.get('remote_url')} target='_blank' style={{ cursor: 'pointer' }} title={attachment.get('description')}>
             <canvas width={32} height={32} ref={this.setCanvasRef} className='media-gallery__preview' />
           </a>
         </div>
@@ -257,7 +259,6 @@ export default class MediaGallery extends React.PureComponent {
 
   static propTypes = {
     sensitive: PropTypes.bool,
-    revealed: PropTypes.bool,
     standalone: PropTypes.bool,
     letterbox: PropTypes.bool,
     fullwidth: PropTypes.bool,
@@ -268,6 +269,8 @@ export default class MediaGallery extends React.PureComponent {
     intl: PropTypes.object.isRequired,
     defaultWidth: PropTypes.number,
     cacheWidth: PropTypes.func,
+    visible: PropTypes.bool,
+    onToggleVisibility: PropTypes.func,
   };
 
   static defaultProps = {
@@ -275,13 +278,15 @@ export default class MediaGallery extends React.PureComponent {
   };
 
   state = {
-    visible: this.props.revealed === undefined ? (displayMedia !== 'hide_all' && !this.props.sensitive || displayMedia === 'show_all') : this.props.revealed,
+    visible: this.props.visible !== undefined ? this.props.visible : (displayMedia !== 'hide_all' && !this.props.sensitive || displayMedia === 'show_all'),
     width: this.props.defaultWidth,
   };
 
   componentWillReceiveProps (nextProps) {
-    if (!is(nextProps.media, this.props.media) || nextProps.revealed === true) {
-      this.setState({ visible: nextProps.revealed === undefined ? (displayMedia !== 'hide_all' && !nextProps.sensitive || displayMedia === 'show_all') : nextProps.revealed });
+    if (!is(nextProps.media, this.props.media) && nextProps.visible === undefined) {
+      this.setState({ visible: displayMedia !== 'hide_all' && !nextProps.sensitive || displayMedia === 'show_all' });
+    } else if (!is(nextProps.visible, this.props.visible) && nextProps.visible !== undefined) {
+      this.setState({ visible: nextProps.visible });
     }
   }
 
@@ -294,7 +299,11 @@ export default class MediaGallery extends React.PureComponent {
   }
 
   handleOpen = () => {
-    this.setState({ visible: !this.state.visible });
+    if (this.props.onToggleVisibility) {
+      this.props.onToggleVisibility();
+    } else {
+      this.setState({ visible: !this.state.visible });
+    }
   }
 
   handleClick = (index) => {

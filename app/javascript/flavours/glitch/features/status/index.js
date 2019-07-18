@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import { createSelector } from 'reselect';
 import { fetchStatus } from 'flavours/glitch/actions/statuses';
 import MissingIndicator from 'flavours/glitch/components/missing_indicator';
 import DetailedStatus from './components/detailed_status';
@@ -41,7 +42,7 @@ import { HotKeys } from 'react-hotkeys';
 import { boostModal, favouriteModal, deleteModal } from 'flavours/glitch/util/initial_state';
 import { attachFullscreenListener, detachFullscreenListener, isFullscreen } from 'flavours/glitch/util/fullscreen';
 import { autoUnfoldCW } from 'flavours/glitch/util/content_warning';
-import { textForScreenReader } from 'flavours/glitch/components/status';
+import { textForScreenReader, defaultMediaVisibility } from 'flavours/glitch/components/status';
 
 const messages = defineMessages({
   deleteConfirm: { id: 'confirmations.delete.confirm', defaultMessage: 'Delete' },
@@ -61,39 +62,58 @@ const messages = defineMessages({
 const makeMapStateToProps = () => {
   const getStatus = makeGetStatus();
 
+  const getAncestorsIds = createSelector([
+    (_, { id }) => id,
+    state => state.getIn(['contexts', 'inReplyTos']),
+  ], (statusId, inReplyTos) => {
+    let ancestorsIds = Immutable.List();
+    ancestorsIds = ancestorsIds.withMutations(mutable => {
+      let id = statusId;
+
+      while (id) {
+        mutable.unshift(id);
+        id = inReplyTos.get(id);
+      }
+    });
+
+    return ancestorsIds;
+  });
+
+  const getDescendantsIds = createSelector([
+    (_, { id }) => id,
+    state => state.getIn(['contexts', 'replies']),
+  ], (statusId, contextReplies) => {
+    let descendantsIds = Immutable.List();
+    descendantsIds = descendantsIds.withMutations(mutable => {
+      const ids = [statusId];
+
+      while (ids.length > 0) {
+        let id        = ids.shift();
+        const replies = contextReplies.get(id);
+
+        if (statusId !== id) {
+          mutable.push(id);
+        }
+
+        if (replies) {
+          replies.reverse().forEach(reply => {
+            ids.unshift(reply);
+          });
+        }
+      }
+    });
+
+    return descendantsIds;
+  });
+
   const mapStateToProps = (state, props) => {
     const status = getStatus(state, { id: props.params.statusId });
     let ancestorsIds = Immutable.List();
     let descendantsIds = Immutable.List();
 
     if (status) {
-      ancestorsIds = ancestorsIds.withMutations(mutable => {
-        let id = status.get('in_reply_to_id');
-
-        while (id) {
-          mutable.unshift(id);
-          id = state.getIn(['contexts', 'inReplyTos', id]);
-        }
-      });
-
-      descendantsIds = descendantsIds.withMutations(mutable => {
-        const ids = [status.get('id')];
-
-        while (ids.length > 0) {
-          let id        = ids.shift();
-          const replies = state.getIn(['contexts', 'replies', id]);
-
-          if (status.get('id') !== id) {
-            mutable.push(id);
-          }
-
-          if (replies) {
-            replies.reverse().forEach(reply => {
-              ids.unshift(reply);
-            });
-          }
-        }
-      });
+      ancestorsIds = getAncestorsIds(state, { id: status.get('in_reply_to_id') });
+      descendantsIds = getDescendantsIds(state, { id: status.get('id') });
     }
 
     return {
@@ -134,6 +154,9 @@ export default class Status extends ImmutablePureComponent {
     isExpanded: undefined,
     threadExpanded: undefined,
     statusId: undefined,
+    loadedStatusId: undefined,
+    showMedia: undefined,
+    revealBehindCW: undefined,
   };
 
   componentDidMount () {
@@ -152,17 +175,31 @@ export default class Status extends ImmutablePureComponent {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (state.statusId === props.params.statusId || !props.params.statusId) {
-      return null;
+    let update = {};
+    let updated = false;
+
+    if (props.params.statusId && state.statusId !== props.params.statusId) {
+      props.dispatch(fetchStatus(props.params.statusId));
+      update.threadExpanded = undefined;
+      update.statusId = props.params.statusId;
+      updated = true;
     }
 
-    props.dispatch(fetchStatus(props.params.statusId));
+    const revealBehindCW = props.settings.getIn(['media', 'reveal_behind_cw']);
+    if (revealBehindCW !== state.revealBehindCW) {
+      update.revealBehindCW = revealBehindCW;
+      if (revealBehindCW) update.showMedia = defaultMediaVisibility(props.status, props.settings);
+      updated = true;
+    }
 
-    return {
-      threadExpanded: undefined,
-      isExpanded: autoUnfoldCW(props.settings, props.status),
-      statusId: props.params.statusId,
-    };
+    if (props.status && state.loadedStatusId !== props.status.get('id')) {
+      update.showMedia = defaultMediaVisibility(props.status, props.settings);
+      update.loadedStatusId = props.status.get('id');
+      update.isExpanded = autoUnfoldCW(props.settings, props.status);
+      updated = true;
+    }
+
+    return updated ? update : null;
   }
 
   handleExpandedToggle = () => {
@@ -170,6 +207,10 @@ export default class Status extends ImmutablePureComponent {
       this.setExpansion(!this.state.isExpanded);
     }
   };
+
+  handleToggleMediaVisibility = () => {
+    this.setState({ showMedia: !this.state.showMedia });
+  }
 
   handleModalFavourite = (status) => {
     this.props.dispatch(favourite(status));
@@ -210,18 +251,24 @@ export default class Status extends ImmutablePureComponent {
   }
 
   handleModalReblog = (status) => {
-    this.props.dispatch(reblog(status));
+    const { dispatch } = this.props;
+
+    if (status.get('reblogged')) {
+      dispatch(unreblog(status));
+    } else {
+      dispatch(reblog(status));
+    }
   }
 
   handleReblogClick = (status, e) => {
-    if (status.get('reblogged')) {
-      this.props.dispatch(unreblog(status));
+    const { settings, dispatch } = this.props;
+
+    if (settings.get('confirm_boost_missing_media_description') && status.get('media_attachments').some(item => !item.get('description')) && !status.get('reblogged')) {
+      dispatch(openModal('BOOST', { status, onReblog: this.handleModalReblog, missingMediaDescription: true }));
+    } else if ((e && e.shiftKey) || !boostModal) {
+      this.handleModalReblog(status);
     } else {
-      if ((e && e.shiftKey) || !boostModal) {
-        this.handleModalReblog(status);
-      } else {
-        this.props.dispatch(openModal('BOOST', { status, onReblog: this.handleModalReblog }));
-      }
+      dispatch(openModal('BOOST', { status, onReblog: this.handleModalReblog }));
     }
   }
 
@@ -302,6 +349,10 @@ export default class Status extends ImmutablePureComponent {
 
   handleEmbed = (status) => {
     this.props.dispatch(openModal('EMBED', { url: status.get('url') }));
+  }
+
+  handleHotkeyToggleSensitive = () => {
+    this.handleToggleMediaVisibility();
   }
 
   handleHotkeyMoveUp = () => {
@@ -477,6 +528,7 @@ export default class Status extends ImmutablePureComponent {
       mention: this.handleHotkeyMention,
       openProfile: this.handleHotkeyOpenProfile,
       toggleSpoiler: this.handleExpandedToggle,
+      toggleSensitive: this.handleHotkeyToggleSensitive,
     };
 
     return (
@@ -505,6 +557,8 @@ export default class Status extends ImmutablePureComponent {
                   expanded={isExpanded}
                   onToggleHidden={this.handleExpandedToggle}
                   domain={domain}
+                  showMedia={this.state.showMedia}
+                  onToggleMediaVisibility={this.handleToggleMediaVisibility}
                 />
 
                 <ActionBar

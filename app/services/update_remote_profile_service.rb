@@ -45,7 +45,7 @@ class UpdateRemoteProfileService < BaseService
   end
 
   def save_emojis
-    do_not_download = DomainBlock.find_by(domain: account.domain)&.reject_media?
+    do_not_download = DomainBlock.reject_media?(account.domain)
 
     return if do_not_download
 

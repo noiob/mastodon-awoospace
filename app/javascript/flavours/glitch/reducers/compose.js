@@ -57,7 +57,7 @@ const totalElefriends = 3;
 const glitchProbability = 1 - 0.0420215528;
 
 const initialState = ImmutableMap({
-  mounted: false,
+  mounted: 0,
   advanced_options: ImmutableMap({
     do_not_federate: false,
     threaded_mode: false,
@@ -182,6 +182,7 @@ function continueThread (state, status) {
     map.set('privacy', status.visibility);
     map.set('sensitive', false);
     map.update('media_attachments', list => list.clear());
+    map.set('poll', null);
     map.set('idempotencyKey', uuid());
     map.set('focusDate', new Date());
     map.set('caretPosition', null);
@@ -275,14 +276,20 @@ const expandMentions = status => {
   return fragment.innerHTML;
 };
 
+const expiresInFromExpiresAt = expires_at => {
+  if (!expires_at) return 24 * 3600;
+  const delta = (new Date(expires_at).getTime() - Date.now()) / 1000;
+  return [300, 1800, 3600, 21600, 86400, 259200, 604800].find(expires_in => expires_in >= delta) || 24 * 3600;
+};
+
 export default function compose(state = initialState, action) {
   switch(action.type) {
   case STORE_HYDRATE:
     return hydrate(state, action.state.get('compose'));
   case COMPOSE_MOUNT:
-    return state.set('mounted', true);
+    return state.set('mounted', state.get('mounted') + 1);
   case COMPOSE_UNMOUNT:
-    return state.set('mounted', false);
+    return state.set('mounted', Math.max(state.get('mounted') - 1, 0));
   case COMPOSE_ADVANCED_OPTIONS_CHANGE:
     return state
       .set('advanced_options', state.get('advanced_options').set(action.option, !!overwrite(!state.getIn(['advanced_options', action.option]), action.value)))
@@ -442,6 +449,7 @@ export default function compose(state = initialState, action) {
       map.set('focusDate', new Date());
       map.set('caretPosition', null);
       map.set('idempotencyKey', uuid());
+      map.set('sensitive', action.status.get('sensitive'));
 
       if (action.status.get('spoiler_text').length > 0) {
         map.set('spoiler', true);
@@ -455,7 +463,7 @@ export default function compose(state = initialState, action) {
         map.set('poll', ImmutableMap({
           options: action.status.getIn(['poll', 'options']).map(x => x.get('title')),
           multiple: action.status.getIn(['poll', 'multiple']),
-          expires_in: 24 * 3600,
+          expires_in: expiresInFromExpiresAt(action.status.getIn(['poll', 'expires_at'])),
         }));
       }
     });
