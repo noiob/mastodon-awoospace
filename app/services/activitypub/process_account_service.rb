@@ -207,7 +207,7 @@ class ActivityPub::ProcessAccountService < BaseService
 
   def domain_block
     return @domain_block if defined?(@domain_block)
-    @domain_block = AllowDomainService.rule_for(@domain)
+    @domain_block = DomainBlock.rule_for(@domain)
   end
 
   def key_changed?
