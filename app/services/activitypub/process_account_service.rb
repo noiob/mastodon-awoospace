@@ -205,6 +205,11 @@ class ActivityPub::ProcessAccountService < BaseService
     AllowDomainService.silenced?(@domain)
   end
 
+  def domain_block
+    return @domain_block if defined?(@domain_block)
+    @domain_block = AllowDomainService.rule_for(@domain)
+  end
+
   def key_changed?
     !@old_public_key.nil? && @old_public_key != @account.public_key
   end
