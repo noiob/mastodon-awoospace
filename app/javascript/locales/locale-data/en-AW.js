@@ -3,7 +3,7 @@
 
 export default [
   {
-    locale: "awoo",
+    locale: "en-AW",
     pluralRuleFunction: function(e, a) {
       var n = String(e).split("."),
         l = !n[1],

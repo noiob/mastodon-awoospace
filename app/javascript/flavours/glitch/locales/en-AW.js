@@ -1,4 +1,4 @@
-import inherited from 'mastodon/locales/awoo.json';
+import inherited from 'mastodon/locales/en-AW.json';
 
 const messages = {
   'getting_started.open_source_notice': 'Glitchsoc is free open source software forked from {Mastodon}. You can contribute or report issues on GitHub at {github}.',
