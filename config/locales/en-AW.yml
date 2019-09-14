@@ -309,8 +309,8 @@ en-AW:
       body: 'You were awooed at by %{name} in:'
       subject: You were awooed at by %{name}
     reblog:
-      body: 'Your awoo was joined by %{name}:'
-      subject: "%{name} joined your awoo"
+      body: 'Your howl was joined by %{name}:'
+      subject: "%{name} joined your howl"
   pagination:
     next: Next
     prev: Prev
