@@ -2,7 +2,7 @@
 
 module SettingsHelper
   HUMAN_LOCALES = {
-    en-AW: 'Awoo!!!',
+    en-AW: 'English (Awoo!)',
     en: 'English',
     ar: 'العربية',
     ast: 'Asturianu',
